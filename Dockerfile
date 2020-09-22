@@ -18,13 +18,6 @@ RUN apt-get update
 RUN python3 -m pip uninstall pip
 RUN apt-get install -y python3-pip git wget
 
-# Install postgresql-client-10
-RUN apt-get install -y gnupg
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >  /etc/apt/sources.list.d/pgdg.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update
-RUN yes Y | apt-get install postgresql-client-10
-
 
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
