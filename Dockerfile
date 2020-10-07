@@ -1,4 +1,4 @@
-FROM dobtorsi/odoo:13.0
+FROM dobtorsi/odoo:14.0
 MAINTAINER Ryan <support@dobtor.com>
 
 USER root
