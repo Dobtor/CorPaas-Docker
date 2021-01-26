@@ -106,7 +106,7 @@ RUN rm wqy-zenhei-0.8.38-1.deb
 
 # WeChat
 #RUN pip install pycrypto
-#RUN pip install xmltodict
+RUN pip install xmltodict
 #RUN pip install optionaldict
 
 # Import
