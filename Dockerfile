@@ -115,6 +115,9 @@ RUN pip3 install pycryptodome
 RUN pip install PyGitHub
 RUN pip install GitPython
 
+# SendGrid
+RUN pip install sendgrid
+
 ## Clean apt-get (copied from odoo)
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false
 RUN apt-get clean
