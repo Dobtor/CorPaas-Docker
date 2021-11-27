@@ -87,6 +87,9 @@ RUN pip3 install raven
 # OCA barcode
 RUN pip3 install python-barcode
 
+# OCA Password Security
+RUN pip3 install zxcvbn
+
 # ECpay invoice
 RUN pip3 install ecpay_invoice3
 
