@@ -98,7 +98,7 @@ RUN pip3 install ecpay_invoice3
 RUN pip install pysftp
 
 # System Mointor
-RUN apt-get install htop
+RUN apt-get install -y htop
 
 # Fonts
 RUN apt-get -y install fontconfig xfonts-utils
