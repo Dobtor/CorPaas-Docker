@@ -18,7 +18,6 @@ RUN apt-get update
 RUN python3 -m pip uninstall pip
 RUN apt-get install -y python3-pip git wget
 
-
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
 RUN pip3 install psycogreen
@@ -88,6 +87,7 @@ RUN pip3 install raven
 RUN pip3 install python-barcode
 
 # OCA Password Security
+RUN pip3 install wheel
 RUN pip3 install zxcvbn
 
 # ECpay invoice
