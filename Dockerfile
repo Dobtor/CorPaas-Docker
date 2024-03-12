@@ -37,6 +37,12 @@ RUN apt-get install -y python3-matplotlib font-manager
 # adhoc-website
 RUN pip3 install mercadopago
 
+# Report Designer
+RUN pip3 install genshi
+RUN pip3 install py3o.template
+RUN apt-get remove -y unoconv
+RUN apt-get install -y unoconv
+
 # odoo extra
 RUN apt-get install -y swig build-essential libffi-dev libssl-dev mercurial
 RUN pip3 install geopy
@@ -100,20 +106,21 @@ RUN pip3 install ecpay_invoice3
 # System Mointor
 RUN apt-get install htop
 
-# Report Designer
-RUN apt-get -y install unoconv
-RUN pip3 install py3o.template
-
 # Odoo Migration
 
 RUN pip install openupgradelib
 
 # Fonts
-RUN apt-get -y install fontconfig xfonts-utils
-RUN wget http://downloads.sourceforge.net/wqy/wqy-zenhei-0.8.38-1.deb
-RUN dpkg -i wqy-zenhei-0.8.38-1.deb
-RUN fc-list | grep WenQuanYi
-RUN rm wqy-zenhei-0.8.38-1.deb
+#RUN apt-get -y install fontconfig xfonts-utils
+#RUN wget http://downloads.sourceforge.net/wqy/wqy-zenhei-0.8.38-1.deb#
+#RUN dpkg -i wqy-zenhei-0.8.38-1.deb
+#RUN fc-list | grep WenQuanYi
+#RUN rm wqy-zenhei-0.8.38-1.deb
+
+RUN apt-get install fonts-noto-cjk
+RUN apt-get install fonts-noto-cjk-extra
+RUN apt-get install fonts-noto-color-emoji
+RUN apt-get install fonts-noto-mono
 
 # WeChat
 #RUN pip install pycrypto
