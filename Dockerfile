@@ -41,6 +41,7 @@ RUN pip3 install mercadopago
 RUN pip3 install genshi
 RUN pip3 install py3o.template
 RUN apt-get remove -y unoconv
+RUN apt-get -y autoremove
 RUN apt-get update
 RUN apt-get install -y unoconv
 
