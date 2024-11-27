@@ -16,7 +16,7 @@ RUN dpkg-reconfigure locales && /usr/sbin/update-locale LANG=en_US.UTF-8
 # Install some deps
 RUN apt-get update
 RUN python3 -m pip uninstall pip
-RUN apt-get install -y python3-pip git wget
+RUN apt-get install -y python3-pip git wget htop
 
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
@@ -102,9 +102,6 @@ RUN pip3 install ecpay_invoice3
 # Remote backup
 
 #RUN pip install pysftp
-
-# System Mointor
-RUN apt-get install htop
 
 # Odoo Migration
 
