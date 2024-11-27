@@ -1,4 +1,4 @@
-FROM dobtorsi/odoo:14.0
+FROM dobtorsi/odoo:17.0e
 MAINTAINER Ryan <support@dobtor.com>
 
 USER root
@@ -15,8 +15,7 @@ ENV LC_ALL en_US.UTF-8
 
 # Install some deps
 RUN apt-get update
-RUN python3 -m pip uninstall pip
-RUN apt-get install -y python3-pip git wget
+RUN apt-get install -y wget
 
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
@@ -106,7 +105,7 @@ RUN pip3 install ecpay_invoice3
 #RUN pip install pysftp
 
 # System Mointor
-RUN apt-get install htop
+RUN apt-get install -y htop
 
 # Odoo Migration
 
@@ -119,10 +118,10 @@ RUN pip install openupgradelib
 #RUN fc-list | grep WenQuanYi
 #RUN rm wqy-zenhei-0.8.38-1.deb
 
-RUN apt-get install fonts-noto-cjk
-RUN apt-get install fonts-noto-cjk-extra
-RUN apt-get install fonts-noto-color-emoji
-RUN apt-get install fonts-noto-mono
+RUN apt-get install -y fonts-noto-cjk
+RUN apt-get install -y fonts-noto-cjk-extra
+RUN apt-get install -y fonts-noto-color-emoji
+RUN apt-get install -y fonts-noto-mono
 
 # WeChat
 #RUN pip install pycrypto
