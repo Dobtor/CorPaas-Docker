@@ -46,7 +46,8 @@ RUN apt install -y python3 python3-uno unoconv
 # odoo extra
 RUN apt-get install -y swig build-essential libffi-dev libssl-dev mercurial
 RUN pip3 install geopy
-RUN pip3 install pyOpenSSL
+RUN pip3 install pyopenssl==22.0.0
+RUN pip3 install cryptography==37.0.0
 
 
 # openupgradelib para varios modulos de oca y luego propios
