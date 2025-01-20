@@ -16,14 +16,16 @@ ENV LC_ALL en_US.UTF-8
 # Install some deps
 RUN apt-get update
 RUN apt-get install -y wget
-
+FROM python:3.12
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
-RUN pip3 install psycogreen
 
 # update pip and install setuptools (required for intalling pip requirements)
+
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools
+
+RUN pip3 install psycogreen
 
 ## Install pip dependencies for adhoc used odoo repositories
 
