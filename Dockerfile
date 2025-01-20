@@ -1,53 +1,53 @@
 FROM dobtorsi/odoo:18.0
-LABEL maintainer="Ryan <support@dobtor.com>"
+MAINTAINER Ryan <support@dobtor.com>
 
 USER root
 
 # Generate locale (en_US for right odoo en_US language config, and C.UTF-8 for postgres and general locale data)
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US.UTF-8
-ENV LC_ALL=en_US.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -qq && apt-get install -y locales -qq
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
 RUN echo 'C.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
 RUN dpkg-reconfigure locales && /usr/sbin/update-locale LANG=en_US.UTF-8
-
-FROM python:3.11
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
 
 # Install some deps
-RUN apt-get update && apt-get install -y python3-pip
+RUN apt-get update
+RUN apt-get install -y wget
 
 # Workers and longpolling dependencies
 RUN apt-get install -y python3-gevent
+RUN pip3 install psycogreen
 
 # update pip and install setuptools (required for intalling pip requirements)
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools
-RUN pip3 install psycogreen
 
 ## Install pip dependencies for adhoc used odoo repositories
 
 # used by many pip packages
-RUN apt-get install -y python3-dev git wget htop
+RUN apt-get install -y python3-dev
 
 # odoo-extra
 RUN apt-get install -y python3-matplotlib font-manager
 
 # adhoc-website
-RUN pip3 install mercadopago 
+RUN pip3 install mercadopago
 
 # Report Designer
 RUN pip3 install genshi
 RUN pip3 install py3o.template
-RUN apt install -y libreoffice libreoffice-common
-RUN apt install -y python3 python3-uno unoconv
+RUN apt-get remove -y unoconv
+RUN apt-get -y autoremove
+RUN apt-get update
+RUN apt-get install -y unoconv
 
 # odoo extra
 RUN apt-get install -y swig build-essential libffi-dev libssl-dev mercurial
 RUN pip3 install geopy
-RUN pip3 install pyopenssl==22.0.0
-RUN pip3 install cryptography==37.0.0
+RUN pip3 install pyOpenSSL
 
 
 # openupgradelib para varios modulos de oca y luego propios
@@ -104,6 +104,9 @@ RUN pip3 install ecpay_invoice3
 
 #RUN pip install pysftp
 
+# System Mointor
+RUN apt-get install -y htop
+
 # Odoo Migration
 
 RUN pip install openupgradelib
@@ -115,13 +118,10 @@ RUN pip install openupgradelib
 #RUN fc-list | grep WenQuanYi
 #RUN rm wqy-zenhei-0.8.38-1.deb
 
-RUN apt-get update && apt-get install -y \
-    fonts-noto \
-    fonts-noto-cjk \
-    fonts-noto-color-emoji \
-    --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y fonts-noto-cjk
+RUN apt-get install -y fonts-noto-cjk-extra
+RUN apt-get install -y fonts-noto-color-emoji
+RUN apt-get install -y fonts-noto-mono
 
 # WeChat
 #RUN pip install pycrypto
