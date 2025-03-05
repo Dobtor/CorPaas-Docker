@@ -1,153 +1,70 @@
+# **基於 Odoo 18.0 官方映像**
 FROM dobtorsi/odoo:18.0
+
 MAINTAINER Ryan <support@dobtor.com>
 
 USER root
 
-# Generate locale (en_US for right odoo en_US language config, and C.UTF-8 for postgres and general locale data)
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -qq && apt-get install -y locales -qq
+# **更新 APT 並安裝必要的系統工具**
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -y \
+    software-properties-common \
+    locales \
+    wget \
+    curl \
+    build-essential \
+    python3-dev \
+    python3-venv \
+    python3-pip \
+    python3-simplejson \
+    libffi-dev \
+    libssl-dev \
+    mercurial \
+    swig \
+    htop \
+    fonts-noto-cjk \
+    fonts-noto-cjk-extra \
+    fonts-noto-color-emoji \
+    fonts-noto-mono
+
+# **設定語系**
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
 RUN echo 'C.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
 RUN dpkg-reconfigure locales && /usr/sbin/update-locale LANG=en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
-# Install some deps
-RUN apt-get update
-RUN apt-get install -y wget
-FROM python:3.12
-# Workers and longpolling dependencies
-RUN apt-get install -y python3-gevent
+# **確認系統預設的 Python 版本**
+RUN python3 --version
 
-# update pip and install setuptools (required for intalling pip requirements)
+# **升級 pip（繞過 PEP 668 限制）**
+RUN python3 -m pip install --upgrade setuptools --break-system-packages
 
-RUN pip3 install --upgrade pip
-RUN pip3 install --upgrade setuptools
+# **安裝 Odoo 依賴的 Python 套件（繞過 PEP 668 限制）**
+RUN pip3 install --break-system-packages \
+    psycogreen mercadopago genshi py3o.template google-api-python-client \
+    geopy pyOpenSSL fabric erppeek fabtools xlrd pycryptodome PyGitHub GitPython \
+    sendgrid raven python-barcode zxcvbn ecpay_invoice3 openupgradelib
 
-RUN pip3 install psycogreen
+# **安裝 Report Designer 相關工具**
+RUN pip3 install genshi py3o.template --break-system-packages
+RUN apt-get remove -y unoconv && apt-get -y autoremove && apt-get update && apt-get install -y unoconv
 
-## Install pip dependencies for adhoc used odoo repositories
+# **安裝額外的系統工具**
+RUN apt-get install -y python3-matplotlib font-manager \
+    libcups2-dev python3-gevent
 
-# used by many pip packages
-RUN apt-get install -y python3-dev
+# **安裝 Remote Backup**
+# RUN pip install pysftp --break-system-packages
 
-# odoo-extra
-RUN apt-get install -y python3-matplotlib font-manager
-
-# adhoc-website
-RUN pip3 install mercadopago
-
-# Report Designer
-RUN pip3 install genshi
-RUN pip3 install py3o.template
-RUN apt-get remove -y unoconv
-RUN apt-get -y autoremove
-RUN apt-get update
-RUN apt-get install -y unoconv
-
-# odoo extra
-RUN apt-get install -y swig build-essential libffi-dev libssl-dev mercurial
-RUN pip3 install geopy
-RUN pip3 install pyOpenSSL
-
-
-# openupgradelib para varios modulos de oca y luego propios
-#RUN pip3 install openupgradelib
-
-# odoo etl, infra and others
-RUN apt-get install -y python3-simplejson
-RUN pip3 install fabric
-RUN pip3 install erppeek
-RUN pip3 install fabtools
-
-# new infra (esto nos fuerza la instalacion de httplib2 0.10.3 que no funciona con pyafipws, por ahora no lo estamos usando tampoco)
-RUN pip3 install pyasn1-modules
-RUN pip3 install google-api-python-client
-
-# oca reports
-#RUN pip3 install xlwt
-
-# odoo kineses
-#RUN pip install xlrd
-
-# oca partner contacts
-#RUN pip install unicodecsv
-
-# oca telephony
-#RUN pip install phonenumbers
-#RUN pip install py-Asterisk
-
-# aeroo direct print
-#RUN apt-get install -y libcups2-dev
-#RUN pip install git+https://github.com/aeroo/aeroolib.git@master
-#RUN pip install pycups==1.9.68
-
-# akretion/odoo-usability
-#RUN pip install BeautifulSoup4
-
-# OCA server-tools
-RUN pip3 install raven
-
-# OCA knowledge
-#RUN pip install python-magic
-
-# OCA barcode
-RUN pip3 install python-barcode
-
-# OCA Password Security
-RUN pip3 install wheel
-RUN pip3 install zxcvbn
-
-# ECpay invoice
-RUN pip3 install ecpay_invoice3
-
-# Remote backup
-
-#RUN pip install pysftp
-
-# System Mointor
+# **安裝 System Monitor**
 RUN apt-get install -y htop
 
-# Odoo Migration
-
-RUN pip install openupgradelib
-
-# Fonts
-#RUN apt-get -y install fontconfig xfonts-utils
-#RUN wget http://downloads.sourceforge.net/wqy/wqy-zenhei-0.8.38-1.deb#
-#RUN dpkg -i wqy-zenhei-0.8.38-1.deb
-#RUN fc-list | grep WenQuanYi
-#RUN rm wqy-zenhei-0.8.38-1.deb
-
-RUN apt-get install -y fonts-noto-cjk
-RUN apt-get install -y fonts-noto-cjk-extra
-RUN apt-get install -y fonts-noto-color-emoji
-RUN apt-get install -y fonts-noto-mono
-
-# WeChat
-#RUN pip install pycrypto
-#RUN pip install xmltodict
-#RUN pip install optionaldict
-
-# Import
-RUN pip install xlrd
-RUN pip3 install pycryptodome
-RUN pip install PyGitHub
-RUN pip install GitPython
-
-# SendGrid
-RUN pip install sendgrid
-
-## Clean apt-get (copied from odoo)
+# **清理系統，減少 Docker 映像大小**
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Make auto_install = False for various modules
-
-#RUN sed  -i  "s/'auto_install': True/'auto_install': False/" /usr/lib/python3/dist-packages/odoo/addons/base_import/__manifest__.py
-
-#RUN sed  -i  "s/'auto_install': True/'auto_install': False/" /usr/lib/python3/dist-packages/odoo/addons/portal/__manifest__.py
-
+# **切換回 Odoo 使用者**
 USER odoo
