@@ -25,7 +25,14 @@ RUN apt-get update -qq && apt-get install -y \
     fonts-noto-cjk \
     fonts-noto-cjk-extra \
     fonts-noto-color-emoji \
-    fonts-noto-mono
+    fonts-noto-mono \
+    gnupg lsb-release
+
+# **安裝 PostgreSQL 18 Client（配合 Cloud SQL 版本）**
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt-get update \
+    && apt-get install -y postgresql-client-18
 
 # **設定語系**
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
@@ -45,7 +52,8 @@ RUN python3 -m pip install --upgrade setuptools --break-system-packages
 RUN pip3 install --break-system-packages \
     psycogreen mercadopago genshi py3o.template google-api-python-client \
     geopy pyOpenSSL fabric erppeek fabtools xlrd pycryptodome PyGitHub GitPython \
-    sendgrid raven python-barcode zxcvbn ecpay_invoice3 openupgradelib
+    sendgrid raven python-barcode zxcvbn ecpay_invoice3 openupgradelib \
+    pathspec
 
 # **安裝 Report Designer 相關工具**
 RUN pip3 install genshi py3o.template --break-system-packages
@@ -53,7 +61,8 @@ RUN apt-get remove -y unoconv && apt-get -y autoremove && apt-get update && apt-
 
 # **安裝額外的系統工具**
 RUN apt-get install -y python3-matplotlib font-manager \
-    libcups2-dev python3-gevent
+    libcups2-dev python3-gevent \
+    cloc
 
 # **安裝 Remote Backup**
 # RUN pip install pysftp --break-system-packages
