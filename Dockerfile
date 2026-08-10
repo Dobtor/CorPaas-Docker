@@ -19,6 +19,7 @@ RUN apt-get update -qq && apt-get install -y \
     python3-simplejson \
     libffi-dev \
     libssl-dev \
+    git \
     mercurial \
     swig \
     htop \
@@ -55,6 +56,9 @@ RUN pip3 install --break-system-packages \
     sendgrid raven python-barcode zxcvbn ecpay_invoice3 openupgradelib \
     pathspec
 
+# **升級 pyOpenSSL（apt 版 23.2.0 與新版 cryptography 不相容，會缺 _lib.GEN_EMAIL）**
+RUN pip3 install --break-system-packages --upgrade pyOpenSSL
+
 # **安裝 Report Designer 相關工具**
 RUN pip3 install genshi py3o.template --break-system-packages
 RUN apt-get remove -y unoconv && apt-get -y autoremove && apt-get update && apt-get install -y unoconv
@@ -74,6 +78,9 @@ RUN apt-get install -y htop
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# **建立 AI 操作專用帳號（附加進 odoo group 以存取 filestore 與 addons）**
+RUN useradd -m -u 1001 -s /bin/bash -G odoo aiops
 
 # **切換回 Odoo 使用者**
 USER odoo
