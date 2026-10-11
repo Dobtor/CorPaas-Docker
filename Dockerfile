@@ -63,6 +63,44 @@ RUN pip3 install --break-system-packages --upgrade pyOpenSSL
 RUN pip3 install genshi py3o.template --break-system-packages
 RUN apt-get remove -y unoconv && apt-get -y autoremove && apt-get update && apt-get install -y unoconv
 
+# ─────────────────────────────────────────────────────────────────────────────
+# **dobtor_doc_editor / dobtor_doc_import 的相依套件**
+#
+# 以下是對照兩個模組的實際 import 與 subprocess 呼叫逐一確認的（AST 掃描 108 支
+# .py 的非 stdlib import，再比對官方 odoo:18 映像裡已有什麼）。
+#
+#   jinja2        **硬性相依**——models/render/sandbox.py 第 19 行是
+#                 top-level `from jinja2.sandbox import SandboxedEnvironment`，
+#                 而 models/__init__.py → render → sandbox 是模組載入路徑。
+#                 ☠️ 它**沒有**寫在 manifest 的 external_dependencies，所以缺的時候
+#                 不是 Odoo 的乾淨錯誤訊息，是模組載入階段的 ImportError。
+#                 官方映像已透過 python3-jinja2 帶進來；這裡明寫是為了讓它成為
+#                 「手動安裝」而不受下方 --auto-remove 影響。
+#   python3-odf   odfpy——dobtor_doc_import 的 .odt 解析（controllers/doc_convert.py）。
+#   libreoffice-writer
+#                 `soffice --headless`——DOCX 匯出與 docx→HTML 匯入的出貨路徑
+#                 （doc_document.py:1233 用 shutil.which('soffice') 守衛，
+#                 缺了不會壞只會少一個格式）。原本只靠 unoconv 的相依間接帶進來，
+#                 明寫才不會哪天改 unoconv 時連帶掉。
+#   fonts-liberation
+#                 Times New Roman / Arial 的 metric-compatible 替代字型。
+#                 LibreOffice 轉檔時用得到；模組自己的字型對照表
+#                 (dobtor_doc_import/controllers/font_serve.py) 也把它列為首選。
+RUN apt-get update -qq && apt-get install -y \
+    python3-jinja2 \
+    python3-odf \
+    libreoffice-writer \
+    fonts-liberation
+
+# **這兩個官方 odoo:18 映像沒有，必須 pip 裝**
+#   python-docx   DOCX 匯出的 fallback（models/render/output.py、doc_document.py
+#                 共 18 處）＋ 範本上傳時把舊的 +++INS+++ 語法轉成 {{ }}
+#                 （models/doc_ins_syntax.py）
+#   docxtpl       /dobtor_doc/fill_template 這條路由（上傳 .docx 範本填值）
+#                 ——缺了該路由會回明確訊息，其餘功能照常
+RUN pip3 install --break-system-packages python-docx docxtpl
+# ─────────────────────────────────────────────────────────────────────────────
+
 # **安裝額外的系統工具**
 RUN apt-get install -y python3-matplotlib font-manager \
     libcups2-dev python3-gevent \
